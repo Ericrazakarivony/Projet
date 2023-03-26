@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# Set the API URL
+API_URL="https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=1&interval=1min"
+
+#echo "$API_URL"
+# Fetch the data from the API and extract the price information
+PRICE=$(curl -s "$API_URL" | jq '.prices[-1][1]')
+
+# Write the price to a file
+echo "$(date +%Y-%m-%d\ %H:%M:%S),$PRICE" >> bitcoin_prices.csv
