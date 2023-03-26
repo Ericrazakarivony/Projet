@@ -1,0 +1,37 @@
+#!/bin/bash
+
+# Set the API URL
+API_URL="https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=2&interval=5min"
+
+# Fetch the data from the API and extract the price information
+DATA=$(curl -s "$API_URL" | jq '.prices[][]')
+
+# Extract the closing price for the last interval
+PRICE=$(echo "$DATA" | tail -n 1 | cut -d, -f2)
+
+# Extract the opening price for the day
+OPEN=$(echo "$DATA" | head -n 1 | cut -d, -f2)
+
+# Extract the max and min prices for the day
+MAX=$(echo "$DATA" | cut -d, -f2 | sort -n | tail -n 1)
+MIN=$(echo "$DATA" | cut -d, -f2 | sort -n | head -n 1)
+
+# Calculate the volatility and percentage change
+VOL=$(echo "scale=2; ($MAX-$MIN)/$OPEN*100" | bc)
+PERCENT=$(echo "scale=2; ($PRICE-$OPEN)/$OPEN*100" | bc)
+# vol1=$(($MAX-$MIN))
+# vol2=$(($vol1/$OPEN))
+# VOL=$(($vol2*100))
+
+# percent1=$(($PRICE-$OPEN))
+# percent2=$(($percent1/$OPEN))
+# PERCENT=$(($percent2*100))
+
+
+# Write the report to a file
+echo "Market opening price: $OPEN" > daily_report.txt
+echo "Market closing price: $PRICE" >> daily_report.txt
+echo "Max price: $MAX" >> daily_report.txt
+echo "Min price: $MIN" >> daily_report.txt
+echo "Volatility: $VOL%" >> daily_report.txt
+echo "Percentage change: $PERCENT%" >> daily_report.txt
