@@ -1,0 +1,40 @@
+import pandas as pd
+import plotly.graph_objs as go
+import dash
+from dash import dcc
+from dash import html
+
+# Load data from file
+data = pd.read_csv('E:/freelance/fiverr/first_python_proj/bitcoin_prices.csv', header=None, names=['timestamp', 'price'])
+data['timestamp'] = pd.to_datetime(data['timestamp'])
+
+# Create the app
+app = dash.Dash(__name__)
+
+# Define the layout
+app.layout = html.Div(children=[
+    html.H1(children='Bitcoin Price Dashboard'),
+    
+    # Display the price graph
+    dcc.Graph(
+        id='price-graph',
+        figure={
+            'data': [go.Scatter(x=data['timestamp'], y=data['price'])],
+            'layout': go.Layout(
+                title='Bitcoin Price',
+                xaxis={'title': 'Time'},
+                yaxis={'title': 'Price (USD)'}
+            )
+        }
+    ),
+    
+    # Display the daily report
+    html.Div(children=[
+        html.H2(children='Daily Report'),
+        html.Iframe(srcDoc=open('E:/freelance/fiverr/first_python_proj/daily_report.txt', 'r').read(),
+                    style={'width': '100%', 'height': '200px'})
+    ])
+])
+
+if __name__ == '__main__':
+    app.run_server(debug=True, host='0.0.0.0') 
